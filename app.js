@@ -25,42 +25,96 @@ function recordMatch() {
     const player = document.getElementById("playerClass").value;
     const opponent = document.getElementById("opponentClass").value;
     const result = document.querySelector("input[name='result']:checked").value;
+    const turn = document.querySelector("input[name='turn']:checked").value;
 
-
-    matchData.push({ player, opponent, result });
+    matchData.push({ player, opponent, result, turn });
     saveData();
     updateStats();
 }
 
 function updateStats() {
     const overall = { win: 0, lose: 0 };
+    const turnStats = {
+        先攻: { win: 0, lose: 0 },
+        後攻: { win: 0, lose: 0 }
+    };
+
     const classStats = {};
 
     matchData.forEach(match => {
         if (!classStats[match.player]) classStats[match.player] = {};
-        if (!classStats[match.player][match.opponent]) classStats[match.player][match.opponent] = { win: 0, lose: 0 };
+        if (!classStats[match.player][match.opponent]) {
+            classStats[match.player][match.opponent] = {
+                win: 0,
+                lose: 0,
+                先攻: { win: 0, lose: 0 },
+                後攻: { win: 0, lose: 0 }
+            };
+        }
 
         classStats[match.player][match.opponent][match.result]++;
+        classStats[match.player][match.opponent][match.turn][match.result]++;
+
         overall[match.result]++;
+        turnStats[match.turn][match.result]++;
     });
 
+    // 全体勝率
     const total = overall.win + overall.lose;
     const overallWinRate = total ? ((overall.win / total) * 100).toFixed(1) : 0;
 
-    document.getElementById("overallStats").textContent =
-        `${overall.win}勝 - ${overall.lose}敗（勝率：${overallWinRate}%）`;
+    // 先攻・後攻勝率
+    const totalFirst = turnStats.先攻.win + turnStats.先攻.lose;
+    const firstWinRate = totalFirst ? ((turnStats.先攻.win / totalFirst) * 100).toFixed(1) : 0;
 
+    const totalSecond = turnStats.後攻.win + turnStats.後攻.lose;
+    const secondWinRate = totalSecond ? ((turnStats.後攻.win / totalSecond) * 100).toFixed(1) : 0;
+
+    // 直近10試合の勝率計算
+    const recentMatches = matchData.slice(-10);
+    const recentWins = recentMatches.filter(m => m.result === "win").length;
+    const recentTotal = recentMatches.length;
+    const recentWinRate = recentTotal ? ((recentWins / recentTotal) * 100).toFixed(1) : 0;
+
+    document.getElementById("overallStats").textContent =
+        `総合: ${overall.win}勝 - ${overall.lose}敗（勝率：${overallWinRate}%）\n` +
+        `先攻: ${turnStats.先攻.win}勝 - ${turnStats.先攻.lose}敗（勝率：${firstWinRate}%）\n` +
+        `後攻: ${turnStats.後攻.win}勝 - ${turnStats.後攻.lose}敗（勝率：${secondWinRate}%）\n` +
+        `直近10試合: ${recentWins}勝 - ${recentTotal - recentWins}敗（勝率：${recentWinRate}%）`;
+
+    // クラス別詳細（相手クラスごとの先攻・後攻勝率も表示）
     let html = "";
-    for (let player in classStats) {
-        html += `<h3>${player}</h3><table><tr><th>相手クラス</th><th>勝ち</th><th>負け</th><th>勝率</th></tr>`;
-        for (let opponent in classStats[player]) {
-            const data = classStats[player][opponent];
-            const total = data.win + data.lose;
-            const rate = total ? ((data.win / total) * 100).toFixed(1) : 0;
-            html += `<tr><td>${opponent}</td><td>${data.win}</td><td>${data.lose}</td><td>${rate}%</td></tr>`;
-        }
-        html += `</table>`;
+for (let player in classStats) {
+    html += `<h3>${player}</h3>
+    <table>
+      <tr>
+        <th>相手クラス</th>
+        <th>勝ち</th><th>負け</th><th>勝率</th>
+        <th>先攻 勝率</th>
+        <th>後攻 勝率</th>
+      </tr>`;
+    for (let opponent in classStats[player]) {
+        const data = classStats[player][opponent];
+        const total = data.win + data.lose;
+        const rate = total ? ((data.win / total) * 100).toFixed(1) : 0;
+
+        const firstTotal = data.先攻.win + data.先攻.lose;
+        const firstRate = firstTotal ? ((data.先攻.win / firstTotal) * 100).toFixed(1) : 0;
+
+        const secondTotal = data.後攻.win + data.後攻.lose;
+        const secondRate = secondTotal ? ((data.後攻.win / secondTotal) * 100).toFixed(1) : 0;
+
+        html += `<tr>
+          <td>${opponent}</td>
+          <td>${data.win}</td>
+          <td>${data.lose}</td>
+          <td>${rate}%</td>
+          <td>${firstRate}%</td>
+          <td>${secondRate}%</td>
+        </tr>`;
     }
+    html += `</table>`;
+}
     document.getElementById("detailedStats").innerHTML = html;
 }
 
