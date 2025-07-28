@@ -154,3 +154,16 @@ function resetData() {
     }
 }
 
+function undoLastMatch() {
+    if (matchData.length === 0) {
+        alert("記録がありません。");
+        return;
+    }
+
+    if (confirm("直前の記録を取り消しますか？")) {
+        matchData.pop(); // 最後の1件を削除
+        saveData();
+        updateStats();
+    }
+}
+

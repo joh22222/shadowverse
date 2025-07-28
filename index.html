@@ -94,6 +94,17 @@
         .section {
             margin-bottom: 40px;
         }
+
+        #overallStats {
+            font-size: 1.2em;
+            /* 文字サイズを1.5倍に */
+            font-weight: bold;
+            /* 太字（任意） */
+            margin-bottom: 1em;
+            /* 下に余白（任意） */
+            white-space: pre-line;
+            /* 改行を表示する */
+        }
     </style>
 </head>
 
@@ -117,6 +128,7 @@
 
         <br />
         <button onclick="recordMatch()">記録する</button>
+        <button onclick="undoLastMatch()">直前の記録を取り消す</button>
         <button onclick="resetData()">リセット</button>
     </div>
 
@@ -125,7 +137,7 @@
 
     <h2>クラス別戦績</h2>
     <div id="detailedStats"></div>
-    
+
     <div id="opponentRate"></div>
 
     <script src="app.js"></script>
