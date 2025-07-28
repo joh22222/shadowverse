@@ -57,6 +57,23 @@ function updateStats() {
 
         overall[match.result]++;
         turnStats[match.turn][match.result]++;
+
+        const opponentCounts = {};
+        matchData.forEach(match => {
+            opponentCounts[match.opponent] = (opponentCounts[match.opponent] || 0) + 1;
+        });
+
+        const totalMatches = matchData.length;
+        let opponentRateHtml = "<h3>相手クラスの割合</h3><table><tr><th>クラス</th><th>回数</th><th>割合</th></tr>";
+        for (let cls of classes) {
+            const count = opponentCounts[cls] || 0;
+            const rate = totalMatches ? ((count / totalMatches) * 100).toFixed(1) : 0;
+            opponentRateHtml += `<tr><td>${cls}</td><td>${count}</td><td>${rate}%</td></tr>`;
+        }
+        opponentRateHtml += "</table>";
+
+        // 画面に表示
+        document.getElementById("opponentRate").innerHTML = opponentRateHtml;
     });
 
     // 全体勝率
@@ -84,8 +101,8 @@ function updateStats() {
 
     // クラス別詳細（相手クラスごとの先攻・後攻勝率も表示）
     let html = "";
-for (let player in classStats) {
-    html += `<h3>${player}</h3>
+    for (let player in classStats) {
+        html += `<h3>${player}</h3>
     <table>
       <tr>
         <th>相手クラス</th>
@@ -93,18 +110,18 @@ for (let player in classStats) {
         <th>先攻 勝率</th>
         <th>後攻 勝率</th>
       </tr>`;
-    for (let opponent in classStats[player]) {
-        const data = classStats[player][opponent];
-        const total = data.win + data.lose;
-        const rate = total ? ((data.win / total) * 100).toFixed(1) : 0;
+        for (let opponent in classStats[player]) {
+            const data = classStats[player][opponent];
+            const total = data.win + data.lose;
+            const rate = total ? ((data.win / total) * 100).toFixed(1) : 0;
 
-        const firstTotal = data.先攻.win + data.先攻.lose;
-        const firstRate = firstTotal ? ((data.先攻.win / firstTotal) * 100).toFixed(1) : 0;
+            const firstTotal = data.先攻.win + data.先攻.lose;
+            const firstRate = firstTotal ? ((data.先攻.win / firstTotal) * 100).toFixed(1) : 0;
 
-        const secondTotal = data.後攻.win + data.後攻.lose;
-        const secondRate = secondTotal ? ((data.後攻.win / secondTotal) * 100).toFixed(1) : 0;
+            const secondTotal = data.後攻.win + data.後攻.lose;
+            const secondRate = secondTotal ? ((data.後攻.win / secondTotal) * 100).toFixed(1) : 0;
 
-        html += `<tr>
+            html += `<tr>
           <td>${opponent}</td>
           <td>${data.win}</td>
           <td>${data.lose}</td>
@@ -112,9 +129,9 @@ for (let player in classStats) {
           <td>${firstRate}%</td>
           <td>${secondRate}%</td>
         </tr>`;
+        }
+        html += `</table>`;
     }
-    html += `</table>`;
-}
     document.getElementById("detailedStats").innerHTML = html;
 }
 
@@ -136,3 +153,4 @@ function resetData() {
         updateStats();
     }
 }
+
