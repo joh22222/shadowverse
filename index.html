@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shadowverse</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    select, button { margin: 5px; }
+    table, th, td { border: 1px solid #ccc; border-collapse: collapse; padding: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Shadowverse</h1>
+
+  <div>
+    自分のクラス:
+    <select id="playerClass"></select>
+    相手のクラス:
+    <select id="opponentClass"></select>
+    勝敗:
+    <label><input type="radio" name="result" value="win" checked> 勝ち</label>
+    <label><input type="radio" name="result" value="lose"> 負け</label>
+    <button onclick="recordMatch()">記録する</button>
+    <button onclick="resetData()">リセット</button>
+  </div>
+
+  <h2>全体戦績</h2>
+  <div id="overallStats">まだ記録がありません。</div>
+
+  <h2>クラス別戦績</h2>
+  <div id="detailedStats"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
